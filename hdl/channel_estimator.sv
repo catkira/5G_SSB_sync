@@ -31,8 +31,9 @@ module channel_estimator #(
 reg [$clog2(MAX_CELL_ID) - 1: 0] N_id, N_id_used;
 reg [3 : 0] state_PBCH_DMRS;
 localparam PBCH_DMRS_LEN = 144;
-reg [1 : 0] PBCH_DMRS [0 : 7][0 : PBCH_DMRS_LEN - 1];
-reg [$clog2(1600) : 0] PBCH_DMRS_cnt;
+localparam NUM_PBCH_DMRS_TYPES = 8;
+reg [1 : 0] PBCH_DMRS [0 : NUM_PBCH_DMRS_TYPES - 1][0 : PBCH_DMRS_LEN - 1];
+reg [$clog2(1601) - 1 : 0] PBCH_DMRS_cnt;  // PBCH_DMRS_cnt runs to 1601, see code below
 reg PBCH_DMRS_ready;
 
 localparam LFSR_N = 31;
@@ -83,7 +84,7 @@ for (ii = 0; ii < 8; ii = ii + 1) begin : LFSR_1
 
     always @(posedge clk_i) begin
         if (!reset_ni) begin
-            for (integer i = 0; i < 1600; i = i + 1) begin
+            for (integer i = 0; i < NUM_PBCH_DMRS_TYPES; i = i + 1) begin
                 PBCH_DMRS[ii][i] = '0;
             end
         end else begin
