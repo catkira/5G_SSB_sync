@@ -1,10 +1,9 @@
-import numpy as np
+import os
+import logging
 import os
 import pytest
-import logging
-import matplotlib.pyplot as plt
-import os
 
+import numpy as np
 import cocotb
 import cocotb_test.simulator
 from cocotb.clock import Clock
@@ -51,6 +50,9 @@ async def simple_test(dut):
 
     numerator = np.random.randint(0, 2**(tb.INPUT_WIDTH) - 1)
     denominator = np.random.randint(1, 2**(tb.INPUT_WIDTH) - 1)
+
+    numerator = 3698210746
+    denominator = 9845
     # numerator = 2775
     # denominator = 48908
     dut.numerator_i.value = numerator
@@ -120,4 +122,4 @@ def test(INPUT_WIDTH, RESULT_WIDTH, PIPELINED):
     )
 
 if __name__ == '__main__':
-    test(INPUT_WIDTH = 16, RESULT_WIDTH = 16, PIPELINED = 1)
+    test(INPUT_WIDTH = 32, RESULT_WIDTH = 16, PIPELINED = 1)
