@@ -232,6 +232,7 @@ receiver_regmap_i(
     .N_id_i(N_id_f),
     .sample_cnt_mismatch_i(sample_cnt_mismatch),
     .missed_SSBs_i(missed_SSBs),
+    .ibar_SSB_i(ibar_SSB_f),
 
     .s_axi_if_awaddr(s_axi_rx_awaddr),
     .s_axi_if_awvalid(s_axi_rx_awvalid),
@@ -586,8 +587,9 @@ reg fs_out_tvalid;
 reg fs_out_SSB_start;
 reg fs_out_symbol_start;
 wire fs_out_tlast;
-reg [2 : 0] ce_ibar_SSB;
-reg ce_ibar_SSB_valid;
+wire [2 : 0] ibar_SSB;
+wire ibar_SSB_valid;
+reg [2 : 0] ibar_SSB_f;
 localparam N_ID_MAX = 1007;
 reg [$clog2(N_ID_MAX) - 1 : 0] N_id;
 reg N_id_valid;
@@ -607,8 +609,8 @@ frame_sync_i
     .reset_ni(reset_ni),
     .N_id_2_i(N_id_2),
     .N_id_2_valid_i(N_id_2_valid),
-    .ibar_SSB_i(ce_ibar_SSB),
-    .ibar_SSB_valid_i(ce_ibar_SSB_valid),
+    .ibar_SSB_i(ibar_SSB),
+    .ibar_SSB_valid_i(ibar_SSB_valid),
     .s_axis_in_tdata(delay_line_data[DELAY_LINE_LEN - 1]),
     .s_axis_in_tvalid(delay_line_valid[DELAY_LINE_LEN - 1]),
 
@@ -756,9 +758,14 @@ channel_estimator_i(
     .m_axis_out_tlast(m_axis_cest_out_tlast),
     .m_axis_out_tvalid(m_axis_cest_out_tvalid),
 
-    .debug_ibar_SSB_o(ce_ibar_SSB),
-    .debug_ibar_SSB_valid_o(ce_ibar_SSB_valid)
+    .debug_ibar_SSB_o(ibar_SSB),
+    .debug_ibar_SSB_valid_o(ibar_SSB_valid)
 );
+
+always @(posedge clk_i) begin
+    if (!reset_ni) ibar_SSB_f <= '0;
+    else if (ibar_SSB_valid) ibar_SSB_f <= ibar_SSB;
+end
 
 demap #(
     .IQ_DW(FFT_OUT_DW / 2),
